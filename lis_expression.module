@@ -1,0 +1,125 @@
+<?php
+
+/**
+ *@file
+ *Write what this file does
+ *Goal: Add a panel to Tripal feature page (gene)
+ *
+ */
+
+
+/**
+ *MY Strategy:
+ *Strategy:
+ *Create a panel 'Gene Expression' in feature view (gene page) (in .module).
+ *Specify a template for this panel (in .module).
+ *Develop the template and other accessory files (.inc, .js, .css, etc.) 
+ *to get the data from ongenomesimple schema and present it.
+ *
+ */
+
+/**
+ *require('includes/lis_expression.chado_node.inc'); //File created: Will need it for adding
+ *a new panel(name, toc) to feature node
+*/
+
+//Inactivated for testing. This includes the hook_node_view() function.
+//require("lis_expression.chado_node.inc");
+
+
+
+/**
+ * Implements hook_views_api().
+ *
+ * Essentially this hook tells drupal that there is views support for
+ *  for this module which then includes tripal_db.views.inc where all the
+ *  views integration code is located.
+ *
+ * @ingroup tripal_analysis_expression  //CHANGE THIS <<<<<<
+ */
+function lis_expression_views_api() {
+  return array(
+    'api' => 3.0,
+  );
+}
+
+
+
+// ****NOTE****: theme name 'lis_expression_profiles' used in chado_node.inc [in fn lis_expression_node_view(]
+
+//[ TESTING HOOK_NODE_VIEW INSIDE .module file instead of in .chado_node.inc]
+/**
+ * Implements hook_node_view().
+ *
+ * @ingroup tripal_exp_profiles // MODIFY or REMOVE <<<<
+ */
+
+
+function lis_expression_node_view($node, $view_mode, $langcode) {
+  switch ($node->type) {
+    case 'chado_feature':
+      // Show feature browser and counts
+      if ($view_mode == 'full') {          
+        
+        $node->content['lis_expression'] = array(
+          '#markup' => theme('lis_expression_profiles', array('node' => $node)),
+          '#tripal_toc_id'    => 'geneexpressionprofile',
+          '#tripal_toc_title' => 'Gene Expression Profile',
+          '#weight' => -80,
+        );
+        /*For overriding the tripal_analysis_expression module's template
+         *'tripal_analysis_expression/theme/templates/tripal_feature_expression.tpl.php' with
+         * this module's 'tripal_exp_profiles/theme/templates/tripal_feature_expression.tpl.php' modified
+         * by me to suit LIS needs.
+         * 
+        */
+        //$node->content['tripal_feature_expression'] = array(
+        //'#markup' => theme('tripal_feature_expression', array('node' => $node)),
+        //'#tripal_toc_id' => 'figure',
+        //'#tripal_toc_title' => 'Expression',
+        //'#weight' => -99,
+        //);
+      } //if
+      break;
+  } //sw
+} //f()
+
+
+
+
+
+
+
+
+
+//Next create the hook_theme()  from
+
+
+/**
+ * Implements hook_theme().
+ *
+ * We need to let drupal know about our theme functions and their arguments.
+ *  We create theme functions to allow users of the module to customize the
+ *  look and feel of the output generated in this module
+ *
+ * @ingroup ?????
+ */
+function lis_expression_theme($existing, $type, $theme, $path) {
+    $this_path = drupal_get_path('module', 'lis_expression');
+    
+    $items = array(
+        
+        //for tripal_feature page 'New panel'
+        'lis_expression_profiles' => array(
+        'variables' => array('node' => NULL),
+        'template' => 'lis_expression',
+        //'template' => 'lis_expression2',
+        'path' => "$this_path/theme/templates",  //$this_path/theme/templates/tripal_feature_exp_profiles.tpl.php created
+        ),
+    );
+    return $items;
+  
+}
+
+
+

@@ -1,0 +1,21 @@
+name = lis_expression
+description = An LIS module for presenting expression data from ongenomesimple schema.
+
+core = 7.x
+
+project = lis_expression
+
+package = LIS
+
+version = 7.x-0(Experimental)
+
+;stylesheets[all][] = theme/css/tripal_example.css
+
+;scripts[]          = theme/js/tripal_example.js
+
+dependencies[] = tripal_core
+dependencies[] = tripal_views
+dependencies[] = tripal_db
+dependencies[] = tripal_cv
+
+;dependencies[] = tripal_analysis_expression
