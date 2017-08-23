@@ -27,7 +27,7 @@
   
   //Get all the datasets available for this genemodel
   //ong-simple//$sql_get_datasets = "SELECT DISTINCT d.dataset_id,d.shortname FROM ongenomesimple.dataset d, ongenomesimple.expressiondata e WHERE d.dataset_id=e.dataset_id and e.genemodel_id = :gene_uniquename";
-  $sql_get_datasets = "SELECT DISTINCT d.dataset_id,d.shortname FROM ongenome.dataset d, ongenome.expressiondata e, ongenome.genemodel gm  WHERE d.dataset_id=e.dataset_id  and e.genemodel_id = gm.genemodel_id and gm.chado_uniquename = :gene_uniquename";  //ongenome
+  $sql_get_datasets = "SELECT DISTINCT d.dataset_id,d.shortname, d.accession_no FROM ongenome.dataset d, ongenome.expressiondata e, ongenome.genemodel gm  WHERE d.dataset_id=e.dataset_id  and e.genemodel_id = gm.genemodel_id and gm.chado_uniquename = :gene_uniquename";  //ongenome
   
   $result_get_datasets = db_query($sql_get_datasets, array(':gene_uniquename' => $gene_uniquename));
   $dataset_counts = $result_get_datasets->rowCount();
@@ -63,10 +63,14 @@ Page title (Include gene name)
   // List available datasets. Give shortname(dataset_id). 
   print "Gene expression data is available for this genemodel in the following dataset(s):"."<br/>"; 
   $count = 0;
+  $accession_no = '';
+  $dataset_shortname = '';
   foreach ($result_get_datasets as $rec) {
       $count = $count + 1;
       $dataset_id = $rec->dataset_id;
-      print $count.". "."<b>".$rec->shortname."</b>"."<br/>";
+      $dataset_accession_no = $rec->accession_no;
+      $dataset_shortname = $rec->shortname;
+      print $count."."."<b>"."&nbsp;&nbsp;".$dataset_accession_no.": "."</b>".$dataset_shortname."<br/>";
       //print "<b>".$rec->shortname."</b>"." (dataset_id:".$rec->dataset_id.")"."<br/>";
   }
   print "<hr/>";
@@ -129,7 +133,7 @@ Page title (Include gene name)
 <div>For gene model: <b><?php echo $gene_uniquename; ?></b></div> <!-- **May have to remove it -->
 
 <!-- DIVs for display of this gene's data-->
-<div id="display_gene_data"  style="width:850px;height:400px;"></div>
+<div id="display_gene_data"  style="width:850px;/*height:400px;*/"></div>
 <hr/>
 
 
@@ -270,7 +274,8 @@ SEC: Profile Neighbors and Gene family members
   // GET PROFILE NEIGHBORS
   
   //$sql_profile_neighbors = "SELECT genemodel_id, profile_neighbors FROM ongenomesimple.profileneighbors WHERE dataset_id = 1 AND genemodel_id = :gene_uniquename";
-  $sql_profile_neighbors = "SELECT genemodel_uniquename, profile_neighbors FROM ongenome.profileneighbors WHERE dataset_id = :dataset_id AND genemodel_uniquename = :gene_uniquename";
+  //$sql_profile_neighbors = "SELECT genemodel_uniquename, profile_neighbors FROM ongenome.profileneighbors WHERE dataset_id = :dataset_id AND genemodel_uniquename = :gene_uniquename";
+  $sql_profile_neighbors = "SELECT genemodel_uniquename, profile_neighbors FROM ongenome.profileneighbors"."_".$dataset_accession_no."  WHERE dataset_id = :dataset_id AND genemodel_uniquename = :gene_uniquename";
   
   //print "gene-unique-name: ".$gene_uniquename."<br/>";
   //print $sql_profile_neighbors;
