@@ -288,9 +288,11 @@ SEC: Profile Neighbors and Gene family members
   //print "<pre>"; print_r($result); print "</pre>";
   
   $profileneighbors_entire_string = $result[0];
+  //print $profileneighbors_entire_string;
   $profileneighbors_r =  explode(";", $profileneighbors_entire_string); // _r into an array
   //print_r($profileneighbors_r); print "<hr/>";
   $profileneighbors_r = array_slice($profileneighbors_r, 0, 20);  // only take a few members from array (EXPERIMENTING with 20 members)
+  //print_r($profileneighbors_r);
   
   $neighbor_members_r = array(); //Just the members without the corr value
   foreach ($profileneighbors_r as $pair) {
@@ -301,7 +303,14 @@ SEC: Profile Neighbors and Gene family members
   }
   
   //print_r($neighbor_members_r);
-  
+
+
+/*  TEST FOR NO NEIGHBORS
+ *TEST  $neighbor_members_r if all the members start with 'NA' then don't plot but just add a message
+ *php: array_key_exist[ don't know if it takes regex], array_walk
+ *js: <array>.every() // checks each member of an array
+
+*/  
   
   ##gene exp of neighbors:
   
