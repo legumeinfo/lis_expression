@@ -124,17 +124,17 @@ Page title (Include gene name)
 
 
 <!--  Select display_type; radio buttons -->
-
+<fieldset style="display: inline-block; padding-left: 10px;">
 <input type="radio" name="display_type" value="plot"  onclick="drawLinePlot (CONTAINER_GENE);"  checked > Line plot &nbsp;&nbsp;&nbsp;
 <input type="radio" name="display_type" value="bar"  onclick="drawBarPlot(CONTAINER_GENE);"> Bar graph &nbsp;&nbsp;&nbsp;
 <input type="radio" name="display_type" value="heatmap"  onclick="drawHeatmap(CONTAINER_GENE)" > Heatmap &nbsp;&nbsp;&nbsp;
 <input type="radio" name="display_type" value="table" onclick="document.getElementById('display_gene_data').innerHTML = div_content_table;"> Table <br/>
-
+</fieldset>
 <div>For gene model: <b><?php echo $gene_uniquename; ?></b></div> <!-- **May have to remove it -->
 
 <!-- DIVs for display of this gene's data-->
 <div id="display_gene_data"  style="width:850px;/*height:400px;*/"></div>
-<hr/>
+<hr/>  <!--  Line after the single gene   -->
 
 
 <script>
@@ -262,13 +262,9 @@ SEC: Profile Neighbors and Gene family members
 ===================================================================
 -->
 
-<h2>Profile Neighbors (Genes with similar expression profile; first 20 for now)</h2>
+<h2>Profile Neighbors</h2>
+Genes with similar expression profile (with r &#8805 0.8); first 20 for now.<br/>
 
-<!--Containers for profile neighbors-->
-<input type="radio" name="display_type_neighbors" value="lineplot"  onclick="drawProfileNeighborsStackedLinePlots (CONTAINER_NEIGHBORS);"  checked > Line plot &nbsp;&nbsp;&nbsp;
-<input type="radio" name="display_type_neighbors" value="heatmap"  onclick="drawProfileNeighborsHeatmap(CONTAINER_NEIGHBORS);"> Heatmap &nbsp;&nbsp;&nbsp;
-<br/><br/>
-<div id="display_profile_neighbors_data"  style="width:850px;/*height:400px;*/"></div>
 
 <?php
   // GET PROFILE NEIGHBORS
@@ -302,15 +298,51 @@ SEC: Profile Neighbors and Gene family members
     $neighbor_members_r[] = $neighbor[0];
   }
   
-  //print_r($neighbor_members_r);
+  //print_r($neighbor_members_r);print "<br/>"; //debug keep
+  
+  
+    /*  TEST FOR NO NEIGHBORS
+    *TEST  $neighbor_members_r if all the members start with 'NA' then don't plot but just add a message
+    *php: array_key_exist[ don't know if it takes regex], array_walk
+    *js: <array>.every() // checks each member of an array
+   
+   */  
+  
+  //<<<<<<<
+  //bool array_key_exists ( mixed $key , array $array );
+  //if (in_array('NA', $neighbor_members_r)) {
+  //  print "NEIGHBORS HAVE  NA"."<br/>";
+  //}  //Discard later
+  
+  function NA_match($item) {  #If there is NA* in value return false
+    //preg_match('/NA/', $item);
+    if (preg_match('/NA/', $item)) {
+      //print "F ";
+      return FALSE;
+    } else {return TRUE;}
+  }
+  
+  //$xxx = array_diff($neighbor_members_r, array('NA'));
+  //print "xxx: ";print_r($xxx); print "<br/>";
+  $neighbor_members_r = array_filter($neighbor_members_r, "NA_match");
+  //print "Filtered NA out: "; //debug, keep
+  //print_r($neighbor_members_r); print "<br/>"; // debug //keep
+  
+  //Test if neighbors array Empty
+  if (!$neighbor_members_r) {
+    $has_neighbors = FALSE;
+    //print "neighbors array  EMPTY<br/>"; // debug, keep
+  } else {
+    $has_neighbors = TRUE;
+    //print "HAS NEIGHBORS<br/>"; // debug, keep
+  }
+  
+  //print "HasNEIGH:".$has_neighbors."<br/>";  
+  
+  
+  //>>>>>>>
 
-
-/*  TEST FOR NO NEIGHBORS
- *TEST  $neighbor_members_r if all the members start with 'NA' then don't plot but just add a message
- *php: array_key_exist[ don't know if it takes regex], array_walk
- *js: <array>.every() // checks each member of an array
-
-*/  
+ 
   
   ##gene exp of neighbors:
   
@@ -330,15 +362,41 @@ SEC: Profile Neighbors and Gene family members
   //print "<br>....<br>";
   //print "<pre>"; print_r($gene_expval_r); print "</pre>"; //Works ok
   $gene_expval_j = json_encode($gene_expval_r);
-  print "<hr>";
+  //print "<hr>";
   //print $gene_expval_j;
   //==============================================
 ?>
 
+<script>
+var has_neighbors = <?php echo $has_neighbors; ?>;
+</script>
+
+
+<!--Containers for profile neighbors-->
+<?php
+  
+  if ($has_neighbors) {
+  echo "<fieldset style=\"display: inline-block; padding-left: 10px;\">";
+  echo "<input type=\"radio\" name=\"display_type_neighbors\" value=\"lineplot\"  onclick=\"drawProfileNeighborsStackedLinePlots (CONTAINER_NEIGHBORS);\"  checked > Line plot &nbsp;&nbsp;&nbsp;";
+  echo "<input type=\"radio\" name=\"display_type_neighbors\" value=\"heatmap\"  onclick=\"drawProfileNeighborsHeatmap(CONTAINER_NEIGHBORS);\"> Heatmap &nbsp;&nbsp;&nbsp;";
+  echo "</fieldset>";
+  } else {
+    echo "<span style=\"font-size: large; color: DarkRed;\"> <br/>**** This genemodel has no neighbors with r &#8805 0.8</span>";
+  }
+?>
+
+<br/><br/>
+<div id="display_profile_neighbors_data"  style="width:850px;/*height:400px;*/"></div>
+
+
+
+
 <!--Stacked Heatmap via plotly from exp values of each memebr from neighbors -->
 
 <!--Organize profile neighbor data before passing onto Plotly-->
+
 <script>
+    
   var gene_expval_j = <?php echo $gene_expval_j; ?>;
   //alert('HELLO');
   //alert(JSON.stringify($gene_expval_j, null, ' '));//works in alert
@@ -444,21 +502,21 @@ SEC: Profile Neighbors and Gene family members
 </script>
 
 <script>
+  if (has_neighbors) {
+    drawProfileNeighborsStackedLinePlots (CONTAINER_NEIGHBORS);
+  }
   //Initial drawing is Lineplot for neighbors
-  drawProfileNeighborsStackedLinePlots (CONTAINER_NEIGHBORS);
+  //drawProfileNeighborsStackedLinePlots (CONTAINER_NEIGHBORS);
 </script>
+
+
 
 <!-- =================================================================== -->
 <!--Gene Family members-->
 <!--  ==================================================================== -->
-
-<h2>Gene Family Members (Expression profile of genes in the same family)</h2>
-<!--Containers for Family members-->
-<input type="radio" name="display_type_family" value="lineplot"  onclick="drawFamilyMembersStackedLinePlots (CONTAINER_FAMILY);"  checked > Line plot &nbsp;&nbsp;&nbsp;
-<input type="radio" name="display_type_family" value="heatmap"  onclick="drawFamilyMembersHeatmap(CONTAINER_FAMILY);"> Heatmap &nbsp;&nbsp;&nbsp;
-<br/><br/>
-<div id="display_family_members_data"  style="width:850px;/*height:400px;*/position:relative;"></div>
-
+<hr>
+<h2>Gene Family Members</h2>
+Expression profile of genes in the same family.
 
 <?php
 
@@ -471,10 +529,38 @@ $query_gene_family = db_query($sql_gene_family, array(':organism_id' => $organis
 $result = $query_gene_family->fetchCol(6); //A simple array. Col 6 is target_uniquename
 //print(json_encode($result));
 //print "<pre>"; print_r($result); print "</pre>";
-//print "HELLO HELLO WORLD";
-$fam_members = $result; //print count($fam_members);
+$fam_members = $result;  //array
+//print count($fam_members)."<br>";
 $member_unique_names = "Member-unique-names: "."'".implode("','",$fam_members)."'"; // becomes quoted and , separated list
 //print $member_unique_names."<hr>";
+
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+if (count($fam_members) > 1) {
+  $has_other_fam_members = TRUE;
+  print "(No. of members in this species: ".count($fam_members).")"."<br/>";
+} else {
+  $has_other_fam_members = FALSE;
+  print "(No. of members in this species: ".count($fam_members).")"."<br/>";
+}
+
+//Containers for Family members
+
+  
+  if ($has_other_fam_members) {
+
+    echo "<fieldset style=\"display: inline-block; padding-left: 10px;\">";
+    echo "<input type=\"radio\" name=\"display_type_family\" value=\"lineplot\"  onclick=\"drawFamilyMembersStackedLinePlots (CONTAINER_FAMILY);\"  checked > Line plot &nbsp;&nbsp;&nbsp;";
+    echo "<input type=\"radio\" name=\"display_type_family\" value=\"heatmap\"  onclick=\"drawFamilyMembersHeatmap(CONTAINER_FAMILY);\"> Heatmap &nbsp;&nbsp;&nbsp;";
+    echo "</fieldset>";
+
+  } else {
+    echo "<span style=\"font-size: large; color: DarkRed;\"> <br/>**** This genemodel has no other gene family members in this species.</span>";
+  }
+
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
 //------------------------------------
 
 $gene_expval_fam_r = array(); //Array of gene exp values for each member gene with [sample] => value
@@ -498,6 +584,14 @@ $gene_expval_fam_j = json_encode($gene_expval_fam_r);
 //print $gene_expval_j;
 //==============================================  
 ?>
+
+<br/><br/>
+<div id="display_family_members_data"  style="width:850px;/*height:400px;*/position:relative;"></div>
+
+<script>
+var hasOtherFamMembers = <?php echo $has_other_fam_members; ?>;
+</script>
+
 
 <?php //Stacked Heatmap via plotly from exp values of each memebr of family ?>
 
@@ -605,7 +699,10 @@ $gene_expval_fam_j = json_encode($gene_expval_fam_r);
 </script>
 
 <script>
+  if (hasOtherFamMembers) {
+    drawFamilyMembersStackedLinePlots (CONTAINER_FAMILY);
+  }
   //Initial drawing is Lineplot for neighbors
-  drawFamilyMembersStackedLinePlots (CONTAINER_FAMILY);
+  //drawFamilyMembersStackedLinePlots (CONTAINER_FAMILY);
 </script>
 
