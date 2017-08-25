@@ -64,7 +64,7 @@ function lis_expression_node_view($node, $view_mode, $langcode) {
         $node->content['lis_expression'] = array(
           '#markup' => theme('lis_expression_profiles', array('node' => $node)),
           '#tripal_toc_id'    => 'geneexpressionprofile',
-          '#tripal_toc_title' => 'Gene Expression',
+          '#tripal_toc_title' => 'Expression',
           '#weight' => -80,
         );
         /*For overriding the tripal_analysis_expression module's template
