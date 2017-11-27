@@ -83,7 +83,15 @@ Page title (Include gene name)
   $feature_id = $feature->feature_id;
   $organism_id = $feature->organism_id->organism_id;
   //print "feature-id: ".$feature_id."; ";   print "organism-id: ".$organism_id. "; ";  print "dataset_id: ".$dataset_id; print "<br/>"; print "<hr />";
+  $genus = $feature->organism_id->genus;
+  $species = $feature->organism_id->species;
+  //print $genus."::".$species;
 ?>
+
+<script>
+var genus   =  "<?php  echo $genus;   ?>";
+var species =  "<?php  echo $species; ?>";
+</script>
 
 <?php
   //Get expression data for this genemodel_id for a dataset 
@@ -263,7 +271,7 @@ SEC: Profile Neighbors and Gene family members
 -->
 
 <h2>Profile Neighbors</h2>
-Genes with similar expression profile (with r &#8805 0.8); first 20 for now.<br/>
+Genes with similar expression profile (with r &#8805 0.8); first 20 for now.&nbsp;&nbsp;&nbsp;<br/>
 
 
 <?php
@@ -378,8 +386,9 @@ var has_neighbors = <?php echo $has_neighbors; ?>;
   if ($has_neighbors) {
   echo "<fieldset style=\"display: inline-block; padding-left: 10px;\">";
   echo "<input type=\"radio\" name=\"display_type_neighbors\" value=\"lineplot\"  onclick=\"drawProfileNeighborsStackedLinePlots (CONTAINER_NEIGHBORS);\"  checked > Line plot &nbsp;&nbsp;&nbsp;";
-  echo "<input type=\"radio\" name=\"display_type_neighbors\" value=\"heatmap\"  onclick=\"drawProfileNeighborsHeatmap(CONTAINER_NEIGHBORS);\"> Heatmap &nbsp;&nbsp;&nbsp;";
+  echo "<input type=\"radio\" name=\"display_type_neighbors\" value=\"heatmap\"  onclick=\"drawProfileNeighborsHeatmap(CONTAINER_NEIGHBORS);\"> Heatmap** &nbsp;&nbsp;&nbsp;";
   echo "</fieldset>";
+  echo "(**The <strong>heatmap has links</strong> to profile neighbors)";
   } else {
     echo "<span style=\"font-size: large; color: DarkRed;\"> <br/>**** This genemodel has no neighbors with r &#8805 0.8</span>";
   }
@@ -409,9 +418,12 @@ var has_neighbors = <?php echo $has_neighbors; ?>;
   //alert(exp_vals);
   
   var G = [];
+  var G_anchorText = [];
   var V = [];
   for (var x in gene_expval_j) {
     G.push(x);
+    linkToGene = "<a  href=\"/feature/"+genus+"/"+species+"/gene/"+x+"#pane=geneexpressionprofile"+"\""+ ">"+x+"</a>";
+    G_anchorText.push(linkToGene);
   }
   console.log(G);
   
@@ -446,6 +458,7 @@ var has_neighbors = <?php echo $has_neighbors; ?>;
       
       //xdata is k;
       ydata = G;
+      ydata = G_anchorText;  //the gene names are now urls to the gene page.
       zdata = Vall;
       
       var data_neighbors_hmap = [
@@ -516,7 +529,7 @@ var has_neighbors = <?php echo $has_neighbors; ?>;
 <!--  ==================================================================== -->
 <hr>
 <h2>Gene Family Members</h2>
-Expression profile of genes in the same family.
+Expression profile of genes in the same family.&nbsp;
 
 <?php
 
@@ -550,8 +563,9 @@ if (count($fam_members) > 1) {
 
     echo "<fieldset style=\"display: inline-block; padding-left: 10px;\">";
     echo "<input type=\"radio\" name=\"display_type_family\" value=\"lineplot\"  onclick=\"drawFamilyMembersStackedLinePlots (CONTAINER_FAMILY);\"  checked > Line plot &nbsp;&nbsp;&nbsp;";
-    echo "<input type=\"radio\" name=\"display_type_family\" value=\"heatmap\"  onclick=\"drawFamilyMembersHeatmap(CONTAINER_FAMILY);\"> Heatmap &nbsp;&nbsp;&nbsp;";
+    echo "<input type=\"radio\" name=\"display_type_family\" value=\"heatmap\"  onclick=\"drawFamilyMembersHeatmap(CONTAINER_FAMILY);\"> Heatmap** &nbsp;&nbsp;&nbsp;";
     echo "</fieldset>";
+    echo "(**The <strong>heatmap has links</strong> to the other family members)";
 
   } else {
     echo "<span style=\"font-size: large; color: DarkRed;\"> <br/>**** This genemodel has no other gene family members in this species.</span>";
@@ -608,9 +622,12 @@ var hasOtherFamMembers = <?php echo $has_other_fam_members; ?>;
   //alert(exp_vals);
   
   var G_fam = [];
+  var G_fam_anchorText = []; //anchor text with url to gene page
   var V_fam = [];
   for (var x in gene_expval_fam_j) {
     G_fam.push(x);
+    linkToGene = "<a  href=\"/feature/"+genus+"/"+species+"/gene/"+x+"#pane=geneexpressionprofile"+"\""+ ">"+x+"</a>";
+    G_fam_anchorText.push(linkToGene);
   }
   console.log(G_fam);
   
@@ -643,7 +660,8 @@ var hasOtherFamMembers = <?php echo $has_other_fam_members; ?>;
   function drawFamilyMembersHeatmap (container) {
   CONTAINER_FAMILY.innerHTML = "";
   //xdata is k;
-  ydata = G_fam;
+  //ydata = G_fam; //original (just the gene name) and WORKS
+  ydata = G_fam_anchorText; // anchor/link text with url to gene page
   zdata = Vall_fam;
   
   var data_fam_hmap = [
@@ -680,6 +698,7 @@ var hasOtherFamMembers = <?php echo $has_other_fam_members; ?>;
       data_traces_for_scatter = []; //Constructing array of individual neighbor traces
       for (var i=0; i < G_fam.length; i++) {
         trace = {x: k, y: Vall_fam[i], type: 'scatter', name: G_fam[i]}; //To try name:'gene_name'
+                //other options: , visible: 'legendonly'
         data_traces_for_scatter.push(trace);
       }
       
@@ -690,11 +709,17 @@ var hasOtherFamMembers = <?php echo $has_other_fam_members; ?>;
       
       var layout = {  
         margin: { t: 0, l:30, b: 130},
-        height: graphicHeight
+        height: graphicHeight   /*,
+        showlegend: true*/
       };
       
       Plotly.newPlot(container, data_traces_for_scatter, layout);  // w/ layout brings whole range into view
       //Plotly.newPlot(container, data_traces_for_scatter);  //w/o layout; only a few visible
+      
+      CONTAINER_FAMILY.on('plotly_click', function(){
+        alert('You clicked this Plotly chart!');
+      });
+      
   }
 </script>
 
