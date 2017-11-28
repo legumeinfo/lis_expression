@@ -206,7 +206,8 @@ var species =  "<?php  echo $species; ?>";
       var layout = {
           margin: { t: 0, b: 130 },
           paper_bgcolor: '#f5f5f5',
-          plot_bgcolor: '#c7c7c7'
+          plot_bgcolor: '#c7c7c7',
+	  yaxis: {title: 'TPM'}
       };
     
       Plotly.newPlot(container, dataLinePlot, layout);
@@ -228,6 +229,7 @@ var species =  "<?php  echo $species; ?>";
           margin: { t: 0, b: 130 },
           height: 350,
           //xaxis: { side: 'bottom', gridwidth: 1 } // xaxis label at bottom (default)
+	  yaxis: {title: 'TPM'}
       };
       Plotly.newPlot(container, dataBar, layout);
   }
@@ -242,7 +244,8 @@ var species =  "<?php  echo $species; ?>";
             y: [geneName],
             z: [vals],
             type: 'heatmap',
-            colorscale: 'Rd'
+            colorscale: 'Rd',
+	    colorbar: {title:'TPM', titleside:'right'}
           }
       ];
       var layout = {  
@@ -467,6 +470,7 @@ var has_neighbors = <?php echo $has_neighbors; ?>;
           y: ydata,
           z: zdata,
           type: 'heatmap',
+	  colorbar: {title:'TPM', titleside:'right'},
           //colorscale: 'Picnic',
           colorscale: 'Rd',   //Hot,Jet,Greens*,Greys,Picnic*,Portland,RdBu,YIGnBu,YIOrRd,Bluered,Earth,Electric,Blackbody,Reds*(Rd),Blues
           ygap:0.15,
@@ -506,6 +510,7 @@ var has_neighbors = <?php echo $has_neighbors; ?>;
       
       var layout = {  
         margin: { t: 0, l:50, b: 130},
+	yaxis: {title: 'TPM'},
         height: graphicHeight
       };
       
@@ -671,6 +676,7 @@ var hasOtherFamMembers = <?php echo $has_other_fam_members; ?>;
       z: zdata,
       type: 'heatmap',
       colorscale: 'Rd',
+      colorbar: {title:'TPM', titleside:'right'},
       ygap:0.45
     }
   ];
@@ -709,8 +715,8 @@ var hasOtherFamMembers = <?php echo $has_other_fam_members; ?>;
       
       var layout = {  
         margin: { t: 0, l:30, b: 130},
-        height: graphicHeight   /*,
-        showlegend: true*/
+        height: graphicHeight,
+        yaxis: {title: 'TPM'}
       };
       
       Plotly.newPlot(container, data_traces_for_scatter, layout);  // w/ layout brings whole range into view
