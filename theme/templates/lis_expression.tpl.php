@@ -353,6 +353,61 @@ Genes with similar expression profile (with r &#8805 0.8); first 20 for now.&nbs
   
   //>>>>>>>
 
+  
+  //<<<<<<<<<<<<<  Neighbors name to legumemine
+  
+  //CAUTION     !!!!   UNDER DEVELOPMENT     !!!!
+    
+  //Function: Get Display/Short Names of neighbors from uniquenames
+      //Given an array of chado.uniquenames, should return array of display names
+      //print "ORG-outside fn:".$organism_id."<br/>";
+  function get_gene_shortname_list($uniquename_list, $organism_id) {  //$uniquename_list must be an array
+    //Given an array of gene chado.feature.uniquenames return array of corresponding chado.feature.names
+    
+        //example uniquename: cicar.ICC4958.v2.0.Ca_01152
+        //$organism_id  already defined in the beginning.
+        //$neighbor_members_r is the array of gene uniquenames vailable
+        
+    //$organism_id;
+    //print "ORG-inside f():".$organism_id;
+    $uniquename_list_str = "('".implode("','", $uniquename_list)."')"; //convert to coma-sep string for sql in clause
+    //print "<br/>uniquenames: ".$uniquename_list_str."<br/>";
+       
+    
+    $sql = "select name from chado.feature where type_id=(select cvterm_id from chado.cvterm where name='gene') and organism_id = :organism_id and uniquename in ". $uniquename_list_str;  //These three beacause `UNIQUE CONSTRAINT, btree (organism_id, uniquename, type_id)` in feature table
+    //print "</br>"."org:".$organism_id."-----".$sql."</br>";
+    
+        //Example lists:
+/*
+*cajca.ICPL87119.gnm1.ann1.C.cajan_00002,cajca.ICPL87119.gnm1.ann1.C.cajan_00003,cajca.ICPL87119.gnm1.ann1.C.cajan_00004,cajca.ICPL87119.gnm1.ann1.C.cajan_00005,cajca.ICPL87119.gnm1.ann1.C.cajan_00007
+*
+cicar.ICC4958.v2.0.Ca_00038,cicar.ICC4958.v2.0.Ca_01148,cicar.ICC4958.v2.0.Ca_01167,cicar.ICC4958.v2.0.Ca_01216,cicar.ICC4958.v2.0.Ca_01228
+
+
+ */
+    
+    //$query_result = db_query($sql, array(':organism_id' => $organism_id, ':uniquename_list_str' => $uniquename_list_str));
+    $query_result = db_query($sql, array(':organism_id' => $organism_id,));
+//REMOVE line    //db_query($sql_profile_neighbors, array(':dataset_id' => $dataset_id, ':gene_uniquename' => $gene_uniquename));
+    
+    //$gene_names_r = $query_result->fetchAll();
+    $gene_names_r = $query_result->fetchCol();
+    //print "names:".":count- ".count($gene_names_r)."<pre>";
+    //print_r($gene_names_r);
+    //print "</pre>";
+    
+    return $gene_names_r;
+    
+  }  //end: fn get_gene_shortname
+
+  $gene_names_r = get_gene_shortname_list($neighbor_members_r, $organism_id); //an array of gene names
+  $gene_names_str = implode("%0A", $gene_names_r); //to string; sep is "%0A", line ending
+  $url_string_to_legume_mine = "https://intermine.legumefederation.org/legumemine/bag.do?type=Gene&text=".$gene_names_str;
+  //print "<a target=\"_blank\"    href=\"" . $url_string_to_legume_mine . "\">". "To LegumeMine fro further analysis</a>";
+
+
+  //>>>>>>>>>>>>  neighbors name 
+
  
   
   ##gene exp of neighbors:
@@ -392,6 +447,7 @@ var has_neighbors = <?php echo $has_neighbors; ?>;
   echo "<input type=\"radio\" name=\"display_type_neighbors\" value=\"heatmap\"  onclick=\"drawProfileNeighborsHeatmap(CONTAINER_NEIGHBORS);\"> Heatmap** &nbsp;&nbsp;&nbsp;";
   echo "</fieldset>";
   echo "(**The <strong>heatmap has links</strong> to profile neighbors)";
+  echo "<br/>"."<a target=\"_blank\"    href=\"" . $url_string_to_legume_mine . "\">". "Send the list of profile neighbors to LegumeMine for further analysis.</a>";
   } else {
     echo "<span style=\"font-size: large; color: DarkRed;\"> <br/>**** This genemodel has no neighbors with r &#8805 0.8</span>";
   }
