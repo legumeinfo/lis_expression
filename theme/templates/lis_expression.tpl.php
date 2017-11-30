@@ -374,7 +374,7 @@ Genes with similar expression profile (with r &#8805 0.8); first 20 for now.&nbs
     //print "<br/>uniquenames: ".$uniquename_list_str."<br/>";
        
     
-    $sql = "select name from chado.feature where type_id=(select cvterm_id from chado.cvterm where name='gene') and organism_id = :organism_id and uniquename in ". $uniquename_list_str;  //These three beacause `UNIQUE CONSTRAINT, btree (organism_id, uniquename, type_id)` in feature table
+    $sql_chado = "select name from chado.feature where type_id=(select cvterm_id from chado.cvterm where name='gene') and organism_id = :organism_id and uniquename in ". $uniquename_list_str;  //These three beacause `UNIQUE CONSTRAINT, btree (organism_id, uniquename, type_id)` in feature table
     //print "</br>"."org:".$organism_id."-----".$sql."</br>";
     
         //Example lists:
@@ -383,12 +383,15 @@ Genes with similar expression profile (with r &#8805 0.8); first 20 for now.&nbs
 *
 cicar.ICC4958.v2.0.Ca_00038,cicar.ICC4958.v2.0.Ca_01148,cicar.ICC4958.v2.0.Ca_01167,cicar.ICC4958.v2.0.Ca_01216,cicar.ICC4958.v2.0.Ca_01228
 
+('cajca.ICPL87119.gnm1.ann1.C.cajan_00002','cajca.ICPL87119.gnm1.ann1.C.cajan_00003','cajca.ICPL87119.gnm1.ann1.C.cajan_00004','cajca.ICPL87119.gnm1.ann1.C.cajan_00005','cajca.ICPL87119.gnm1.ann1.C.cajan_00007')
 
- */
-    
+ */    
+    $sql = "select genemodel_name from ongenome.genemodel where chado_uniquename in ". $uniquename_list_str;
+    //print $sql;
+    $query_result = db_query($sql);//
+    //$query_result = db_query($sql_chado, array(':organism_id' => $organism_id,)); /WORKS VERY WELL
     //$query_result = db_query($sql, array(':organism_id' => $organism_id, ':uniquename_list_str' => $uniquename_list_str));
-    $query_result = db_query($sql, array(':organism_id' => $organism_id,));
-//REMOVE line    //db_query($sql_profile_neighbors, array(':dataset_id' => $dataset_id, ':gene_uniquename' => $gene_uniquename));
+
     
     //$gene_names_r = $query_result->fetchAll();
     $gene_names_r = $query_result->fetchCol();
@@ -404,7 +407,6 @@ cicar.ICC4958.v2.0.Ca_00038,cicar.ICC4958.v2.0.Ca_01148,cicar.ICC4958.v2.0.Ca_01
   $gene_names_str = implode("%0A", $gene_names_r); //to string; sep is "%0A", line ending
   $url_string_to_legume_mine = "https://intermine.legumefederation.org/legumemine/bag.do?type=Gene&text=".$gene_names_str;
   //print "<a target=\"_blank\"    href=\"" . $url_string_to_legume_mine . "\">". "To LegumeMine fro further analysis</a>";
-
 
   //>>>>>>>>>>>>  neighbors name 
 
