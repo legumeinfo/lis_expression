@@ -274,8 +274,8 @@ SEC: Profile Neighbors and Gene family members
 -->
 
 <h2>Profile Neighbors</h2>
-Genes with similar expression profile (with r &#8805 0.8); first 20 for now.&nbsp;&nbsp;&nbsp;<br/>
-
+<!-- Genes with similar expression profile (with r &#8805 0.8); first 20 for now.&nbsp;&nbsp;&nbsp;<br/> -->
+Genes with similar expression profile (with r &#8805 0.8); top 50 for now.&nbsp;&nbsp;&nbsp;<br/>
 
 <?php
   // GET PROFILE NEIGHBORS
@@ -298,7 +298,7 @@ Genes with similar expression profile (with r &#8805 0.8); first 20 for now.&nbs
   //print $profileneighbors_entire_string;
   $profileneighbors_r =  explode(";", $profileneighbors_entire_string); // _r into an array
   //print_r($profileneighbors_r); print "<hr/>";
-  $profileneighbors_r = array_slice($profileneighbors_r, 0, 20);  // only take a few members from array (EXPERIMENTING with 20 members)
+  //$profileneighbors_r = array_slice($profileneighbors_r, 0, 20);  // only take a few members from array (EXPERIMENTING with 20 members)
   //print_r($profileneighbors_r);
   
   $neighbor_members_r = array(); //Just the members without the corr value
