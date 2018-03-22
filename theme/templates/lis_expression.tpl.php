@@ -111,7 +111,7 @@ The example code is in my '~/liswork/mymoduledevo/tripal_exp_profiles/theme/temp
 .w3-navbar li a,.w3-navitem,.w3-navbar li .w3-btn,.w3-navbar li .w3-input{display:block;padding:8px 8px}
 .w3-navbar li .w3-btn,.w3-navbar li .w3-input{border:none;outline:none;width:100%}
 .w3-navbar li a{color:#000;} /*trying initial color*/
-.w3-navbar li a:hover{color:#000;background-color:#ccc}
+.w3-navbar li a:hover{color:#000;background-color:#999}
 .w3-navbar li a:focus{color:#000;background-color:#fff} /*trying focus*/
 .w3-navbar .w3-dropdown-hover,.w3-navbar .w3-dropdown-click{position:static}
 .w3-navbar .w3-dropdown-hover:hover,.w3-navbar .w3-dropdown-hover:first-child,.w3-navbar .w3-dropdown-click:hover{background-color:#ccc;color:#000}
