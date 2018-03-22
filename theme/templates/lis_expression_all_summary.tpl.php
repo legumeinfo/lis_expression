@@ -34,7 +34,7 @@
   print "<tr>";
       print "<td>"."<b>Organism</b>"."</td>";
       print "<td style='width:5%'>"."<b>Acc No.</b>"."</td>";
-      print "<td>"."<b>Mappet to</b>"."</td>";
+      print "<td>"."<b>Mapped to</b>"."</td>";
       //print "<td style='width:15%'>"."<b>Abbreviated name</b>"."</td>";
       print "<td style='width:20%'>"."<b>Title</b>"."</td>";
       print "<td style='width:40%'>"."<b>Description</b>"."</td>";
