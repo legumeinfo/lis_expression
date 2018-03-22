@@ -132,17 +132,17 @@ The example code is in my '~/liswork/mymoduledevo/tripal_exp_profiles/theme/temp
 <div class="w3-container">
   <!-- <link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css"> -->
   <ul class="w3-navbar w3-gray">
-    <li><a  href="javascript:void(0)"
+    <li><a  title="Show expression of this gene"  href="javascript:void(0)"
         onclick="getExpressionData (datasetDropdown.value, geneUniquename, genus, species); ">
         <b>THIS GENE</b></a></li>
     
-    <li><a href="javascript:void(0)"  
+    <li><a  title="Show expression of other genes with very similar expression pattern"  href="javascript:void(0)"  
         onclick="get_profile_neighbors_data ('display_data', datasetDropdown.value, geneUniquename, genus, species); ">
         <b>PROFILE <br/>NEIGHBORS</b></a></li>
     
-    <li><a href="javascript:void(0)" onclick="get_family_members_data ('display_data', datasetDropdown.value, geneUniquename, genus, species); "><b>FAMILY <br/>MEMBERS</b></a></li>
+    <li><a  title="Show expression of gene family members"  href="javascript:void(0)" onclick="get_family_members_data ('display_data', datasetDropdown.value, geneUniquename, genus, species); "><b>GENE FAMILY <br/>MEMBERS</b></a></li>
     
-    <li><a  href="javascript:void(0)" onclick="getDatasetMetadata(datasetDropdown.value);"><b>DATASET<br/> DETAILS</b></a></li>
+    <li><a  title="Show metdata for the dataset and its samples"  href="javascript:void(0)" onclick="getDatasetMetadata(datasetDropdown.value);"><b>DATASET<br/> DETAILS</b></a></li>
     
   </ul>
 </div>
