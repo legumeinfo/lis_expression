@@ -13,7 +13,7 @@
 ?>
 
 <h2>Summary of Expression Data at LIS</h2>
-
+<p>**Temporary link to the <a  href="/lis_expression/demo">Demo page</a></p>
 
 <?php
   
@@ -55,7 +55,7 @@
       if (strpos($acc_no, 'cajca') !== false) {
           $exemplar = 'cajca.ICPL87119.gnm1.ann1.C.cajan_07765'; 
       } elseif (strpos($acc_no, 'cicar') !== false) {
-          $exemplar = 'cicar.ICC4958.v2.0.Ca_01885';
+          $exemplar = 'cicar.ICC4958.gnm2.ann1.Ca_01885';
           $species = 'arietinum_ICC4958';  //This is messy for Cicar
       } elseif (strpos($acc_no, 'phavu') !== false) {
           $exemplar = 'Phvul.001G011300.v1.0';  

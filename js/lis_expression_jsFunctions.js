@@ -773,10 +773,10 @@
     
     
     
-    graphicHeight = 130+(yData.length)*25; //original
+    graphicHeight = 250+(yData.length)*25; //original
 
     var layout = {
-        margin: { t: 0, l:50, b: 130},
+        margin: { t: 0, l:50, b: 250, r: 80},
         yaxis: {title: 'TPM'},
         height: graphicHeight
     };

@@ -152,7 +152,7 @@ The example code is in my '~/liswork/mymoduledevo/tripal_exp_profiles/theme/temp
 <div id="generic">
   <!--CONTAINER STARTS:<br/>-->
   <div id="control_display_type_radios"></div>
-  <div id="display_data"  style="width:850px;/*height:400px;*/"></div>
+  <div id="display_data"  style="width:1050px;/*height:600px;*/"></div>
   <!--CONTAINER ENDS:<br/>-->
 </div>
 
