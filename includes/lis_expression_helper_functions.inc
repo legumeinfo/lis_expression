@@ -185,7 +185,7 @@
                         ." ongenome.genemodel AS gm "
                       ." WHERE "
                         ." d.dataset_id = ds.dataset_id AND d.dataset_id=e.dataset_id "
-                        ." AND e.dataset_sample_id=ds.sample_id AND s.sample_id=ds.sample_id "
+                        ." AND e.dataset_sample_id=ds.dataset_sample_id AND s.sample_id=ds.sample_id "
                         ." AND e.genemodel_id=gm.genemodel_id AND gm.chado_uniquename = :member"; //AND d.accession_no = :acc"; //print "$acc";
                         //AND d.accession_no = :acc
                         //QUESTION: it get's a gene's expr data without the accession no ??. It looks alright because there is only one accession; might create proble when >1 datasets. Check if suspicion is right??
@@ -272,7 +272,7 @@
           //print "<br>".$member."<br/>";
       
           //$sql_exp_fam = "select d.shortname as d_shortname,s.shortname as s_shortname,e.genemodel_id,e.exp_value  from ongenomesimple.dataset as d, ongenomesimple.sample as s ,ongenomesimple.expressiondata as e where d.dataset_id = s.dataset_id and d.dataset_id=e.dataset_id and e.dataset_sample_id=s.sample_id and e.genemodel_id = "."'".$member."'";
-          $sql_exp_fam = "SELECT d.shortname AS d_shortname, s.sample_uniquename AS s_shortname, gm.genemodel_name, e.exp_value  FROM ongenome.dataset AS d, ongenome.sample AS s ,ongenome.expressiondata AS e, ongenome.dataset_sample AS ds, ongenome.genemodel AS gm WHERE d.dataset_id = ds.dataset_id and d.dataset_id=e.dataset_id and e.dataset_sample_id=ds.sample_id and s.sample_id=ds.sample_id and e.genemodel_id=gm.genemodel_id and d.accession_no = :accession_no and gm.chado_uniquename = :member";
+          $sql_exp_fam = "SELECT d.shortname AS d_shortname, s.sample_uniquename AS s_shortname, gm.genemodel_name, e.exp_value  FROM ongenome.dataset AS d, ongenome.sample AS s ,ongenome.expressiondata AS e, ongenome.dataset_sample AS ds, ongenome.genemodel AS gm WHERE d.dataset_id = ds.dataset_id and d.dataset_id=e.dataset_id and e.dataset_sample_id=ds.dataset_sample_id and s.sample_id=ds.sample_id and e.genemodel_id=gm.genemodel_id and d.accession_no = :accession_no and gm.chado_uniquename = :member";
           //print $sql_exp."<br>";
           //$query_exp_fam = db_query($sql_exp_fam)->fetchAllKeyed(1,3);
           $query_exp_fam = db_query($sql_exp_fam, array(':member' => $member, ':accession_no' => $acc))->fetchAllKeyed(1,3);
@@ -369,7 +369,7 @@ function create_html_main_div_genelevel_data ($gene, $acc) {
 QUOTING_HTML;
 
 
-    $sql_expression = "SELECT d.shortname as d_shortname, s.sample_uniquename as s_shortname, gm.genemodel_name,  e.exp_value  FROM  ongenome.dataset as d, ongenome.sample as s , ongenome.dataset_sample ds, ongenome.expressiondata as e, ongenome.genemodel as gm WHERE  d.dataset_id = ds.dataset_id and d.dataset_id=e.dataset_id and e.dataset_sample_id=ds.sample_id and ds.sample_id = s.sample_id and e.genemodel_id = gm.genemodel_id and gm.chado_uniquename = :gene_uniquename and d.accession_no = :accession_no";    
+    $sql_expression = "SELECT d.shortname as d_shortname, s.sample_uniquename as s_shortname, gm.genemodel_name,  e.exp_value  FROM  ongenome.dataset as d, ongenome.sample as s , ongenome.dataset_sample ds, ongenome.expressiondata as e, ongenome.genemodel as gm WHERE  d.dataset_id = ds.dataset_id and d.dataset_id=e.dataset_id and e.dataset_sample_id=ds.dataset_sample_id and ds.sample_id = s.sample_id and e.genemodel_id = gm.genemodel_id and gm.chado_uniquename = :gene_uniquename and d.accession_no = :accession_no";    
     $result_expression = db_query($sql_expression, array(':gene_uniquename' => $gene, ':accession_no' => $acc));
    
 
