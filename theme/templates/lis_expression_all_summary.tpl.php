@@ -13,13 +13,25 @@
 ?>
 
 <h2>Summary of Expression Data at LIS</h2>
-<p>**Temporary link to the <a  href="/lis_expression/demo">Demo page</a></p>
+<p>Explore expression data at LIS: <a  href="/lis_expression/demo">Demo page</a></p>
 
 <?php
+
+      //ADD EXEMPLAR after a daset is added
+      //Exemplar for each dataset in an Assoc array
+  $exemplars_list = array();
+      //$exemplar_list [''] = '';
+  $exemplar_list ['cajca1'] = 'cajca.ICPL87119.gnm1.ann1.C.cajan_07765';
+  $exemplar_list ['cicar1'] = 'cicar.ICC4958.gnm2.ann1.Ca_01885';
+  $exemplar_list ['cicar2'] = 'cicar.CDCFrontier.gnm1.ann1.Ca_04638';  //expressed only in early-flower-bud, Ubiquitin like
+  $exemplar_list ['phavu1'] = 'Phvul.001G011300.v1.0';
+  $exemplar_list ['vigun1'] = 'vigun.IT97K-499-35.gnm1.ann1.Vigun01g004300';
+      //$exemplar_list [''] = '';
+  
   
   //psql -x -c "SELECT od.accession_no, od.shortname, od.name, od.description FROM ongenome.dataset AS od, ongenome.genome AS og, ongenome.organism AS oo  WHERE od.genome_id=og.genome_id AND og.organism_id=oo.organism_id AND oo.abbrev='cicar'"
   
-  $sql_all = "SELECT oo.genus, oo.species, od.accession_no, od.shortname, od.name, od.description, og.name AS genome_name FROM ongenome.dataset AS od, ongenome.genome AS og, ongenome.organism AS oo  WHERE od.genome_id=og.genome_id AND og.organism_id=oo.organism_id  ORDER BY od.accession_no";
+  $sql_all = "SELECT oo.genus, oo.species, oo.name AS org_name, oo.chado_organism_id, od.accession_no, od.shortname, od.name, od.description, og.name AS genome_name FROM ongenome.dataset AS od, ongenome.genome AS og, ongenome.organism AS oo  WHERE od.genome_id=og.genome_id AND og.organism_id=oo.organism_id  ORDER BY od.accession_no";
   $queried_all = db_query($sql_all);
       //print(gettype($queried_all));
   $ds_count = $queried_all->rowCount();
@@ -45,28 +57,26 @@
       //print(gettype($rec));
       $genus = $rec->genus;
       $species = $rec->species;
+      $org_name = $rec->org_name;
+      $chado_organism_id = $rec->chado_organism_id;
       $acc_no = $rec->accession_no;
       $shortname = $rec->shortname;
       $name = $rec->name;
       $description = $rec->description;
       $genome_name = $rec->genome_name;
       
-      //Link to exemplar genemodel gene page.
-      if (strpos($acc_no, 'cajca') !== false) {
-          $exemplar = 'cajca.ICPL87119.gnm1.ann1.C.cajan_07765'; 
-      } elseif (strpos($acc_no, 'cicar') !== false) {
-          $exemplar = 'cicar.ICC4958.gnm2.ann1.Ca_01885';
-          $species = 'arietinum_ICC4958';  //This is messy for Cicar
-      } elseif (strpos($acc_no, 'phavu') !== false) {
-          $exemplar = 'Phvul.001G011300.v1.0';  
-      } elseif (strpos($acc_no, 'vigun') !== false) {
-          $exemplar = 'vigun.IT97K-499-35.gnm1.ann1.Vigun01g004300';  
-      }
+          //Get Chado species name for the link (arietinum_CDCFrontier, arietinum_ICC4958)
+      $sql_chado_org = "SELECT species FROM chado.organism WHERE organism_id=".$chado_organism_id;
+          //$species_chado = db_query($sql_chado_org)->fetchObject();
+      $species_chado =db_query($sql_chado_org)->fetchColumn();
+           
+      $exemplar = $exemplar_list[$acc_no];
       
-      $acc_link = "<a href=\"/feature/$genus/$species/gene/$exemplar#pane=geneexpressionprofile\" >$acc_no</a>";
+          //Do not use $org_name. It creates confusion between cicar1-vs-cicar2
+      $acc_link = "<a href=\"/feature/$genus/$species_chado/gene/$exemplar#pane=geneexpressionprofile\" >$acc_no</a>";
       
       print "<tr>";
-        print "<td>".$genus." ".$species."</td>";
+        print "<td>".$genus." ". $species ."</td>";
         
         //print "<td>" . "<b>" . $acc_no. "<b>" . "</td>";
         print "<td>" . "<b>" . $acc_link. "<b>" . "</td>";
