@@ -79,7 +79,7 @@
         print "<td>".$genus." ". $species ."</td>";
         
         //print "<td>" . "<b>" . $acc_no. "<b>" . "</td>";
-        print "<td>" . "<b>" . $acc_link. "<b>" . "</td>";
+        print "<td id='$acc_no' >" . "<b>" . $acc_link. "<b>" . "</td>";
         print "<td>".$genome_name."</td>";
         //print "<td>".$shortname."</td>";
         print "<td>".$name."</td>";
