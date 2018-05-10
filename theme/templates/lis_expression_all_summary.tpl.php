@@ -17,7 +17,7 @@
 
 <?php
 
-      //ADD EXEMPLAR after a daset is added
+  /*    //ADD EXEMPLAR after a daset is added
       //Exemplar for each dataset in an Assoc array
   $exemplars_list = array();
       //$exemplar_list [''] = '';
@@ -27,11 +27,11 @@
   $exemplar_list ['phavu1'] = 'Phvul.001G011300.v1.0';
   $exemplar_list ['vigun1'] = 'vigun.IT97K-499-35.gnm1.ann1.Vigun01g004300';
       //$exemplar_list [''] = '';
-  
+  */
   
   //psql -x -c "SELECT od.accession_no, od.shortname, od.name, od.description FROM ongenome.dataset AS od, ongenome.genome AS og, ongenome.organism AS oo  WHERE od.genome_id=og.genome_id AND og.organism_id=oo.organism_id AND oo.abbrev='cicar'"
   
-  $sql_all = "SELECT oo.genus, oo.species, oo.name AS org_name, oo.chado_organism_id, od.accession_no, od.shortname, od.name, od.description, og.name AS genome_name FROM ongenome.dataset AS od, ongenome.genome AS og, ongenome.organism AS oo  WHERE od.genome_id=og.genome_id AND og.organism_id=oo.organism_id  ORDER BY od.accession_no";
+  $sql_all = "SELECT oo.genus, oo.species, oo.name AS org_name, oo.chado_organism_id, od.accession_no, od.shortname, od.name, od.description, od.exemplar, og.name AS genome_name FROM ongenome.dataset AS od, ongenome.genome AS og, ongenome.organism AS oo  WHERE od.genome_id=og.genome_id AND og.organism_id=oo.organism_id  ORDER BY od.accession_no";
   $queried_all = db_query($sql_all);
       //print(gettype($queried_all));
   $ds_count = $queried_all->rowCount();
@@ -63,6 +63,7 @@
       $shortname = $rec->shortname;
       $name = $rec->name;
       $description = $rec->description;
+      $exemplar = $rec->exemplar;
       $genome_name = $rec->genome_name;
       
           //Get Chado species name for the link (arietinum_CDCFrontier, arietinum_ICC4958)
@@ -70,7 +71,7 @@
           //$species_chado = db_query($sql_chado_org)->fetchObject();
       $species_chado =db_query($sql_chado_org)->fetchColumn();
            
-      $exemplar = $exemplar_list[$acc_no];
+      //$exemplar = $exemplar_list[$acc_no];
       
           //Do not use $org_name. It creates confusion between cicar1-vs-cicar2
       $acc_link = "<a href=\"/feature/$genus/$species_chado/gene/$exemplar#pane=geneexpressionprofile\" >$acc_no</a>";
