@@ -67,9 +67,10 @@
       $genome_name = $rec->genome_name;
       
           //Get Chado species name for the link (arietinum_CDCFrontier, arietinum_ICC4958)
-      $sql_chado_org = "SELECT species FROM chado.organism WHERE organism_id=".$chado_organism_id;
+      //$sql_chado_org = "SELECT species FROM chado.organism WHERE organism_id=".$chado_organism_id;
+      $sql_chado_org = "SELECT species FROM chado.organism WHERE organism_id= :chado_organism_id";
           //$species_chado = db_query($sql_chado_org)->fetchObject();
-      $species_chado =db_query($sql_chado_org)->fetchColumn();
+      $species_chado =db_query($sql_chado_org, array(':chado_organism_id' => $chado_organism_id))->fetchColumn();
            
       //$exemplar = $exemplar_list[$acc_no];
       
