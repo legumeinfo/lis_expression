@@ -3,15 +3,17 @@
 /**
  *@file
  *lis_expression_helper_functions.inc
- *Goal: Hold helper functions for the lis_expression module
+ *Goal: Helper PHP functions for the lis_expression module
  */
 
  /*
   *1. function uniquename_to_datasets($gene)
-  *2. function get_exprsn_data_as_json ($acc, $gene)
+  *2. function get_exprsn_data_as_json ($acc, $gene)  #For a single gene
   *3. function get_dataset_metadata_as_json ($acc)
   *4. function get_profile_neighbors_expression_json ($acc, $gene)
   *5. function get_family_members_expression_json ($acc, $gene)
+  *6. Function summarize_all_lis_expression_callback()
+  *7. Function lis_expression_demo_callback ()
   *
   */
 
@@ -24,12 +26,11 @@
  *  From a gene_uniquename, makes an array of available datasets(uniquename,name,acc-no,dataset_id,shortname,etc.)
  */
 
-      //Used in lis_exp.tpl.php  
+      //Used in lis_exp.tpl.php for avail datasets
   function uniquename_to_datasets($gene) {
       //From a gene_uniquename,
       //returns array of available datasets(acc-no,shortname)
       
-      //DELETE//  //$sql = "SELECT d.accession_no, d.shortname, FROM ongenome.dataset d, ongenome.expressiondata e, ongenome.genemodel gm  WHERE d.dataset_id=e.dataset_id  and e.genemodel_id = gm.genemodel_id and gm.chado_uniquename = :gene_uniquename";  //ongenome
       $sql = "select d.dataset_id, d.accession_no,d.shortname, d.name FROM ongenome.genemodel gm, ongenome.genome g, ongenome.dataset d WHERE gm.genome_id=g.genome_id and d.genome_id=g.genome_id and gm.chado_uniquename = :gene_uniquename"; //'cicar.ICC4958.v2.0.Ca_00006'"; 
       $queried = db_query($sql, array(':gene_uniquename' => $gene));
       //print_r($queried);
@@ -57,10 +58,13 @@
 //-------------------------
 /*2. function get_exprsn_data_as_json ($acc, $gene)
  *
+ *(For a single gene)
+ *Used: .mod file, _menu_alter, callback for %/%/json
+ *
  */
 
   function get_exprsn_data_as_json ($acc, $gene) {
-    //Given gene-uniquename and dataset-accession-no:
+    // Given gene-uniquename and dataset-accession-no:
     // $gene: ongenome.genemodel.chado_uniquename; $acc: ongenome.dataset.accession_no
     // Callback for hook_menu_alter 'lis_expression/%/%/json' (/lis_expression/phavu1/Phvul.001G000600.v1.0/json)
     
@@ -92,10 +96,11 @@
 
   function get_dataset_metadata_as_json ($acc) {
       
-      //Given a dataset acc, get all iots metadata including sample details as json
-          //$acc: ongenome.dataset.accession_no
+      //Given a dataset acc, get all metadata including sample details as json
+      //$acc: ongenome.dataset.accession_no
       // Callback for hook_menu_alter: 'lis_expression/dataset_metadata/%/json' (/lis_expression/dataset_metadata/phavu1/json)
       
+      // Dataset metadata:
       $sql_dataset = "SELECT   ds.dataset_id AS ds_datasetid, ds.accession_no AS ds_accession, ds.shortname AS ds_shortname, ds.name AS ds_name, ds.description AS ds_description, src.name AS src_name, src.origin AS src_origin, src.description AS src_description, src.bioproj_acc AS src_bioproj_acc, src.bioproj_title AS src_bioproj_title, src.bioproj_description AS src_bioproj_description, src.sra_proj_acc AS src_sra_proj_acc, src.geo_series AS src_geo_series, gn.name AS gn_name, gn.shortname AS gn_shortname, gn.description AS gn_description, gn.source AS gn_source, gn.build AS gn_build, gn.annotation AS gn_annotation, m.name AS m_name, m.shortname AS m_shortname, m.version AS m_version, m.description AS m_description, m.details AS m_details, o.name AS o_name, o.genus AS o_genus, o.species AS o_species, o.subspecies AS o_subspecies, o.cultivar_type AS o_cultivar_type, o.line AS o_line, o.abbrev AS o_abbrev  FROM ongenome.dataset AS ds, ongenome.datasetsource AS src, ongenome.genome AS gn, ongenome.method AS m, ongenome.organism AS o WHERE src.datasetsource_id=ds.datasetsource_id AND gn.genome_id=ds.genome_id AND m.method_id=ds.method_id AND o.organism_id=gn.organism_id AND ds.accession_no = :accession_no";
       //print $sql_dataset;  //print $acc;
       
@@ -106,7 +111,7 @@
               //Gives assoc array: {"phavu1":{"datasetid":"2","datasetaccession":"phavu1","shortname":"Bean expression atlas Negro jamapa", ....}}.  `After JSON.parse`.phavu1['shortname']=Bean expression atlas Negro jamapa
               //$result_dataset_j = json_encode($result_dataset->fetchAll()); // gives array and can't get values by field name.
       
-  //  Getting sample-json-data in this ajax call   
+  //  Sample-json-data in this ajax call   
       $sql_samples = "SELECT s.sample_id, s.datasetsource_id, s.organism_id, s.sample_uniquename, s.name, s.shortname, s.description, s.age, s.dev_stage, s.plant_part, s.treatment, s.other_attributes, s.ncbi_accessions FROM ongenome.sample AS s, ongenome.dataset_sample AS dsm, ongenome.dataset AS ds, ongenome.organism AS o WHERE s.sample_id=dsm.sample_id AND dsm.dataset_id=ds.dataset_id AND o.organism_id=s.organism_id AND ds.accession_no = :accession_no  ORDER BY s.sample_id";
       $result_samples = db_query($sql_samples, array(':accession_no' => $acc,));
       $result_samples_j = json_encode($result_samples->fetchAllAssoc('sample_id')); // a string
@@ -124,108 +129,75 @@
   }  //get_dataset_metadata_as_json()
 
 
-
-/*
+  
+  /*
  *Function:
  *4. get_profile_neighbors_expression_json ()
  *
- *  Callback from .module, _menu_alter, 'lis_expression/profile_neighbors/%/%/json'
- *
- *
+ *  Changed name from new_get_profile_neighbors_expression_json()
  */
 
+  
+  //function new_get_profile_neighbors_expression_json ($acc, $gene) {
   function get_profile_neighbors_expression_json ($acc, $gene) {
-          //Given a gene(uniquename) and a dataset acc (from ongenome.dataset), get the profile neighbors list from ongenome.
+    
+      //Construct ongenome profile neighbors table name
+      $tablename_profile_neighbor = "ongenome.profileneighbors_" . $acc; 
+       
+      $sql_expr_neighb = "
+          SELECT n.neighbor_uniquename, g.genemodel_name AS neighbor_name, n.correlation, json_agg(e.exp_value ORDER BY s.sample_id ASC) AS expression_values 
+          FROM
+          (SELECT pn.neighbor_uniquename, pn.correlation
+          FROM $tablename_profile_neighbor AS pn
+          WHERE pn.genemodel_uniquename = :querygene  AND pn.correlation > 0.7 ORDER BY pn.correlation DESC) AS n
+          JOIN ongenome.genemodel AS g ON g.chado_uniquename=n.neighbor_uniquename
+          JOIN ongenome.expressiondata AS e ON e.genemodel_id=g.genemodel_id
+          JOIN ongenome.dataset AS d ON d.dataset_id=e.dataset_id
+          JOIN ongenome.dataset_sample AS ds ON ds.dataset_sample_id=e.dataset_sample_id
+          JOIN ongenome.sample AS s ON s.sample_id=ds.sample_id
+          WHERE d.accession_no= :accession_no
+          GROUP BY n.neighbor_uniquename, g.genemodel_name, n.correlation
+          ORDER BY n.correlation DESC  ";
           
-      $sql_profile_neighbors = "SELECT genemodel_uniquename, profile_neighbors  " .
-                               " FROM ongenome.profileneighbors"."_".$acc. "  ". 
-                               " WHERE genemodel_uniquename = :gene_uniquename ";
-      
-      $query_profile_neighbors = db_query($sql_profile_neighbors, array(':gene_uniquename' => $gene));
-      $result = $query_profile_neighbors->fetchCol(1); //A simple array. Col 1 has profile neighbors as a ';' separated string
-                  //$result = $query_profile_neighbors->fetchAllKeyed(0, 1); //
-                  //$result = $query_profile_neighbors->fetchAllAssoc('genemodel_uniquename'); //
-                  //print_r($result);
-      
-      $profileneighbors_entire_string = $result[0];
-      $neighbors_list_r =  explode(";", $profileneighbors_entire_string); // _r into an array
-      $neighbors_list_r = array_slice($neighbors_list_r, 0, 25);
-
-      //Filtering out 'NA's and empties
-      function NA_match($item) {  #If there is NA* in value return false
-          //preg_match('/NA/', $item);
-          if (preg_match('/NA|^[\s]*[\s]*$/', $item)) {  //is 'NA' OR 'empty OR white spaces' 
-          //if (preg_match('/NA/', $item)) {  
-              //print "F ";
-              return FALSE;
-          } else {return TRUE;}
-      }
-      $neighbors_list_r = array_filter($neighbors_list_r, "NA_match"); //Now a filtered array
-      
+          // json_agg(e.exp_value ORDER BY s.sample_id ASC): gives an array [x, y, z, ...]
+    
         
-      $profneighbors_hr = array(); //initiate assoc array(hr for hash array)
-
-      foreach ($neighbors_list_r as $pair) {
-          //print $pair."<br/>";
-          $neighbor_corr = explode(":", $pair);
-          $neighbor = $neighbor_corr[0];  // the neighbor gene
-          $corr = $neighbor_corr[1];  // and its corr value
-              //Forming an assoc array of this neighbor with corr and expr as keys.
-              //  'expr' is NULL for now. (Later expr will be injected into this array
-              //  with  sample-name and expr-value pairs)
-          
-          //print $acc;
-          // Expression array (sample=>value)
-          $sql_exp =  "SELECT ".
-                        "d.shortname AS d_shortname, s.sample_uniquename AS s_shortname, "
-                        ." gm.genemodel_name, e.exp_value "
-                      ." FROM "
-                        ." ongenome.dataset AS d, ongenome.sample AS  s, "
-                        ." ongenome.expressiondata AS e, ongenome.dataset_sample AS ds, "
-                        ." ongenome.genemodel AS gm "
-                      ." WHERE "
-                        ." d.dataset_id = ds.dataset_id AND d.dataset_id=e.dataset_id "
-                        ." AND e.dataset_sample_id=ds.dataset_sample_id AND s.sample_id=ds.sample_id "
-                        ." AND e.genemodel_id=gm.genemodel_id AND gm.chado_uniquename = :member"; //AND d.accession_no = :acc"; //print "$acc";
-                        //AND d.accession_no = :acc
-                        //QUESTION: it get's a gene's expr data without the accession no ??. It looks alright because there is only one accession; might create proble when >1 datasets. Check if suspicion is right??
-                        
-          $query_exp = db_query($sql_exp, array(':member' => $neighbor))->fetchAllKeyed(1,3);//ACTUAL
-          //$query_exp = db_query($sql_exp, array(':member' => $neighbor, ':acc' => $acc))->fetchCol(1,3); //':acc' => $acc, 
-          
-          //Get gene common name, instead of uniquename, for compiling list for a link to mines
-          $sql_gene_name = "SELECT gm.genemodel_name "
-                            . " FROM ongenome.dataset AS d, ongenome.genemodel AS gm "
-                            . " WHERE gm.genome_id=d.genome_id AND  d.accession_no= :accession_no "
-                            . " AND gm.chado_uniquename= :gene_uniquename";
-          $query_gene_name = db_query($sql_gene_name, array(':accession_no' => $acc, ':gene_uniquename' => $neighbor ))->fetchField();
-
-          //Inject 'name', 'corr' and 'expr' into the main array with key as $neighbor
-          $profneighbors_hr[$neighbor] = array('name' => $query_gene_name, 'corr' => $corr, 'expr' => $query_exp);
-
-      }  //foreach
+        $query_expr_neighb = db_query($sql_expr_neighb, array(':querygene' => $gene, ':accession_no' => $acc)); //->fetchCol(3);
+        $neighbor_result_row_count  = $query_expr_neighb->rowCount();         
+        $result_expr_neighb = $query_expr_neighb->fetchAll();
+        
+        $part_neighbors_hr["neighbors"] = $result_expr_neighb;
+        
       
-      //print "<pre>";print_r($profneighbors_hr);print "</pre>";print "<hr>"; //debug keep
-      //print_r($profneighbors_hr['cicar.ICC4958.v2.0.Ca_18100']); 
-
-
-      //print_r($neighbors_list_r);print "<br>count: ".count($result);
-      //print "<br>";
+      // MUST USE 'ORDER BY sample_id'. The expr data comes in this order in an array
+      $sql_sample_names = "SELECT ogsa.name FROM ongenome.sample AS ogsa, ongenome.dataset_sample AS ogdasa, ongenome.dataset AS ogda WHERE ogsa.sample_id = ogdasa.sample_id AND ogdasa.dataset_id = ogda.dataset_id AND ogda.accession_no = :acc_no ORDER BY ogsa.sample_id;";
+      $query_sample_names = db_query($sql_sample_names, array(':acc_no' => $acc) );
+      $result_samplenames = $query_sample_names->fetchCol(0);  // first col to an array
       
+              //print_r($result_samplenames);
+      foreach ($result_samplenames as $rec) {
+        $each_samp["sample_name"] = $rec; // each sample into an assoc-array 
+        $samples_r[] = $each_samp; //all samples into an array
+      }
+      $part_samples_hr["samples"] = $samples_r; //
+      
+      $sample_count = $query_sample_names->rowCount();
+      $neighbor_count = $neighbor_result_row_count;
+      
+      $part_query_hr = array("query" => array("gene_uniquename" => $gene, "dataset" => $acc, "neighbor_count" => $neighbor_count));
+      
+          //Debug:
+          //print json_encode($part_query_hr);
+          //print json_encode(array_merge($part_query_hr, $part_samples_hr, $part_neighbors_hr));
+          //print json_encode($part_samples_hr);
+          //print json_encode($result_expr_neighb);
+      print json_encode(array_merge($part_query_hr, $part_samples_hr, $part_neighbors_hr));
     
-      //print "<hr>". json_encode($profneighbors_hr['cicar.ICC4958.v2.0.Ca_18100']['expr']);
-      
-
-      
-      print "{\"".$gene."\":".json_encode($profneighbors_hr)."}"; //ACTUAL
-      
-      
+  }  //get_profile_neighbors_expression_json()
+ 
   
-      drupal_exit();  //to stop further execution in Drupal
-    
-  }  //get_profile_neighbors_expression_json ()
   
-
+  
   /*
  *Function:
  *5. get_family_members_expression_json ()
@@ -237,8 +209,8 @@
   
   function get_family_members_expression_json ($acc, $gene) {
       // Given a dataset acc (from ongenome.dataset) and a gene(uniquename),
-      // get the gene family members from Chado and their expression
-      // in json format from ongenome.
+      // get the gene family members from Chado and their expression from ongenome
+      // in json format.
       //Return empty if no family members **IMP
       
           //Get Chado.organism_id and feature_id for next sql query
@@ -263,7 +235,8 @@
           return;
       }
 
-      //NOT USING//$member_unique_names = "{"."\"FamMemberUniqueNames\":". "[" ."\"".implode("\",\"",$fam_members)."\"". "]" . "}"; // Now a valid json structure of just the member list (no expression data)
+      //NOT USING//$member_unique_names = "{"."\"FamMemberUniqueNames\":". "[" ."\"".implode("\",\"",$fam_members)."\"". "]" . "}";
+      // Now a valid json structure of just the member list (no expression data)
       
       
       //Get expression of fam-members
@@ -290,20 +263,25 @@
   
 
   /*
+  * 6. Function summarize_all_lis_expression_callback()
   * Just returns the theme for the lis_expression summary page.
   * From hook_menu  in 'lis_expression/all'
   */
+
   function summarize_all_lis_expression_callback() {
       
       return theme ('lis_expression_all', array());
       
   }   //function summarize_all_lis_expression()
   
+
   
   /*
-  * Just returns the theme for the lis_expression demo page for workshop.
-  * From hook_menu in 'lis_expression/demo'
+  * 7. Function lis_expression_demo_callback ()
+  *   Just returns the theme for the lis_expression demo page for workshop.
+  *   From hook_menu in 'lis_expression/demo'
   */
+
   function lis_expression_demo_callback () {
       return theme ('lis_expression_demo', array());
   }
@@ -318,7 +296,7 @@
 
 
 
-
+// End of function definations
 
 
 
@@ -327,102 +305,4 @@
                     ///////////////////////////////////////////////////////////
 
 
-/**
- *Function create_html_main_div_genelevel_data
- *    Generate html content for the current genel-evel expression data.
- *    Should include table, bar chart, heatmap, line chart
- *
- */
 
-
-/*
-function create_html_main_div_genelevel_data ($gene, $acc) {
-  //Given gene-uniquename and dataset-accession-no:
-  //Generate html content for the current genel-evel expression data.
-  //Should include table, bar chart, heatmap, line chart
-  // $gene: ongenome.genemodel.chado_uniquename; $acc: ongenome.dataset.accession_no
-  
-    $html  = 'Gene level expression data as line-chart, bar-plot, heatmap and table here ';
-    $html .= 'for '. $gene. ' in '. $acc . '.<br/>';
-    
-    
-
-    $html .= <<<QUOTING_HTML
-    <!--  Select display_type; radio buttons -->
-    <fieldset style="display: inline-block; padding-left: 10px;">
-    <input type="radio" name="display_type" value="plot"  onclick="drawLinePlot (CONTAINER_GENE);"  checked > Line plot &nbsp;&nbsp;&nbsp;
-    <input type="radio" name="display_type" value="bar"  onclick="drawBarPlot(CONTAINER_GENE);"> Bar graph &nbsp;&nbsp;&nbsp;
-    <input type="radio" name="display_type" value="heatmap"  onclick="drawHeatmap(CONTAINER_GENE)" > Heatmap &nbsp;&nbsp;&nbsp;
-    <input type="radio" name="display_type" value="table" onclick="document.getElementById('display_gene_data').innerHTML = div_content_table;"> Table <br/>
-    </fieldset>
-    <div>For gene model: <b>".$gene."</b></div> <!-- **May have to remove it -->
-    
-    <!-- DIVs for display of this gene's data-->
-    <div id="display_gene_data"  style="width:850px;"></div>
-    <hr/>  <!--  Line after the single gene   -->
-    
-    <script>
-    //document.getElementById('display_gene_data').innerHTML = div_content_table;
-    </script>
-    
-<!-- Expression data from db_query into JSON format -->
-QUOTING_HTML;
-
-
-    $sql_expression = "SELECT d.shortname as d_shortname, s.sample_uniquename as s_shortname, gm.genemodel_name,  e.exp_value  FROM  ongenome.dataset as d, ongenome.sample as s , ongenome.dataset_sample ds, ongenome.expressiondata as e, ongenome.genemodel as gm WHERE  d.dataset_id = ds.dataset_id and d.dataset_id=e.dataset_id and e.dataset_sample_id=ds.dataset_sample_id and ds.sample_id = s.sample_id and e.genemodel_id = gm.genemodel_id and gm.chado_uniquename = :gene_uniquename and d.accession_no = :accession_no";    
-    $result_expression = db_query($sql_expression, array(':gene_uniquename' => $gene, ':accession_no' => $acc));
-   
-
-
-  
-    //Expression data into JSON format in php
-    //$result_expression 'HAD' expression data from db_query BUT NEEDS TO BE REPEATED
-    //$result_expression = db_query($sql_expression, array(':gene_uniquename' => $gene_uniquename));
-    $result_expression_j = json_encode($result_expression->fetchAllKeyed(1,3));  //j2 in old code
-    //print "json k:v : ".$result_expression_j; //gets sample_uniquename(1) and exp_value(3)
-    
-    
-    $html .= <<<QUOTING_HTML_1B
-      <div id='ZZZZ'></div>
-      
-        <script type="text/javascript">
-          var jd_gene = <?php echo $result_expression_j; ?>;
-          
-        </script>
-        <p>HELLO YYY</p>
-      
-QUOTING_HTML_1B;
-//Problem in above html:  The script tag doesn't appear for some reason and is removed automatically.
-    
-    //Create divtag for genelevel data   ***DO THIS FIRST FOR TESTING
-    $html .= "<!-- DIVs for display of this gene's data-->";
-    $html .= "<div id=\"display_gene_data\"  style=\"width:850px;\"></div>";
-    //$html .= "<div id=\"display_gene_data\"  style=\"width:850px;height:400px;\"></div>"; //not good
-    $html .= "<hr/>  <!--  Line after the single gene   -->";
-    
-    
-    //$result_expression 'HAD' expression data from db_query BUT NEEDS TO BE REPEATED here; it has been accessed once already
-    $result_expression = db_query($sql_expression, array(':gene_uniquename' => $gene, ':accession_no' => $acc));
-    
-    //table
-    //display_type: Table
-    $div_content_table =  "<table>";
-    $div_content_table .=  "<tr style=''><td><b>Sample (shortname)</b></td><td><b>Expr. Value (TPM)</b></td></tr>";
-    foreach ($result_expression as $rec) {
-        $div_content_table .=  "<tr>";
-        $div_content_table .=    "<td>".$rec->s_shortname."</td>";
-        $div_content_table .=    "<td>".$rec->exp_value."</td>";
-        $div_content_table .=  "</tr>";
-    }
-    $div_content_table .=  "</table>";
-    
-    $html .= $div_content_table;  
-    
-    
-    
-    
-    return $html;
-  
-}  // fn create_html_main_div_genelevel_data
-
-*/

@@ -77,7 +77,8 @@ function lis_expression_menu_alter(&$items) {
         'type' => MENU_CALLBACK,
         'access callback' => TRUE 
   );
-  
+
+/*  
       //For profile-neighbors in json format
   $items['lis_expression/profile_neighbors/%/%/json'] = array(
         'page callback' => 'get_profile_neighbors_expression_json',
@@ -85,6 +86,18 @@ function lis_expression_menu_alter(&$items) {
         'type' => MENU_CALLBACK,
         'access callback' => TRUE 
   );
+*/
+        //NEW TRYING
+        //For profile-neighbors in json format
+  //$items['lis_expression/profile_neighbors/%/%/newjson'] = array(
+  $items['lis_expression/profile_neighbors/%/%/json'] = array(
+        //'page callback' => 'new_get_profile_neighbors_expression_json',
+        'page callback' => 'get_profile_neighbors_expression_json',
+        'page arguments' => array(2, 3), //ex: lis_expression/profile_neighbors/phavu1/Phvul.001G000600.v1.0/XXnewXXjson
+        'type' => MENU_CALLBACK,
+        'access callback' => TRUE 
+  );
+
 
         //For family members in json format
   $items['lis_expression/genefamily_members/%/%/json'] = array(
@@ -109,6 +122,7 @@ function lis_expression_menu_alter(&$items) {
         'type' => MENU_CALLBACK,
         'access callback' => TRUE 
   );
+  
   
   //return $items; //Don't return. Because: The tripal_gene module already has the $items array. This adds to that array
 }  //_menu_alter
@@ -259,194 +273,6 @@ function lis_expression_preprocess(&$variables) {
 
 
 
-
-
-
-
-
-
-
-
-///////////////////     IGNORE:  SCRATCH & OBSOLETE      ///////////////////////
-
-
-
-//  OBSOLETE: WHEN WAS TRYING DROPDOWN WITH DRUPAL FORM-API
-
-
-//  SECTION:  Form Creation: Dataset list dropdown  ===================
-
-
-//Trying form <<<<<
-/*
-function lis_expression_form_datasets_dropdown ($form, &$form_state) {  //list of datasets dropdown
-    //the form_id is 'lis_expression_form_datasets_dropdown'
-    
-    //Get the gene unique-name from tpl.php via the drupal-get-form
-    $geneUniquename = $form_state['build_info']['args'][0];  //Specified in tpl.php as extra arg in drupal_get_form()
-    //Get the array of datasets for this genemodel
-    $datasets_r = uniquename_to_datasets($geneUniquename);
-    
-    //Generate the $options array(assoc.) of avail datasets(acc_no => shortname)
-    $options[''] = ['Choose a dataset']; //the blank option element
-//** NOTE: ideally the page should load with the first option element.
-//   Not able to achieve this in Drupal form (On page load, submit form with default/available values) 
-    foreach ($datasets_r as $d) {
-        $options[$d['acn']] = $d['acn'].": ".$d['snm'];
-    }
-    //drupal_set_message($options);
-    
-    
-    //Define the dropdown form
-    $form = array();
-    
-    $form['datasets'] = array(
-        '#type'=>'select',
-        //'#title'=>t('Select a dataset'),
-        //'#options'=>array('cicar1' => 'Dataset-1', 'phavu1' => 'Dataset-2', 'cajca1' => 'Dataset-3', 'vigun1' => 'Dataset-4'), //For testing only
-        '#options'=> $options,
-        //'#prefix' => '<div id=\'dataset-list\'>',
-        //'#suffix' => '</div>', 
-        '#ajax' => array(
-            'callback' => 'lis_expression_form_datasets_dropdown_submit',
-            //'callback' => 'generate_html',
-            'wrapper' => 'main-div', //this 'div and its content' is updated by this function
-            'progress' => array('type' => 'bar', 'message' => t('Please wait...')), //progress bar
-            
-        )  //ajax array
-    ); // form
-    
-    return $form;
-}  //fn lis_expression_form_datasets_dropdown
-
-*/
-
-
-//<<<<<<<<<<<<<  EXPERIMENTAL form alter
-
-/*  for debug
-function lis_expression_form_alter(&$form, &$form_state, $form_id) {
-//function lis_expression_form_testform_alter(&$form, &$form_state, $form_id) {
-
-     print '<pre>';var_dump(get_defined_vars()); print '</pre>';
-    //drupal_set_message($form_id);
-
-  switch ($form_id)  {
-  //
-      case 'lis_expression_testform':
-          $form['lis_expression_testform'] = array(
-              '#type' => 'select',
-              '#title'=>t('SOME TITLE'),
-              '#ajax' => array(
-                    'callback' => 'lis_expression_testform_submit',
-                    //'callback' => 'generate_html',
-                    'wrapper' => 'extra-div', //this 'div and its content' is updated by this function
-                    'progress' => array('type' => 'bar', 'message' => t('Please wait...')), //progress bar
-                    
-              )
-          );
-          
-      break;
-  } //sw
-  //return $form;
-  
-} //fn
-
-
-function lis_expression_testform_submit ($form, &$form_state) {
-    $form_state['rebuild'] = TRUE;
-    $selected = $form_state['values']['lis_expression_testform'];
-    drupal_set_message("Testform message: ");
-    
-    $html_x_div = "";
-    $html_x_div .= "<div id='extra-div'>";
-    $html_x_div .= "<p>Print something here: ".  "XTRA XTRA". "</p>";
-    
-    
-    
-    
-    $html_x_div .= "</div>"; //**IMP
-    
-    return $html_x_div;
-}
-
-*/ //for debug
-
-
-//>>>>>>>>>>>>>>>>>>>>>>>>>   Experimental
-
-/*
-function lis_expression_form_datasets_dropdown_submit ($form, &$form_state) {
-    //$form_state['storage']['xyz'] = $form_state['values']['xyz'];
-    
-    $form_state['rebuild'] = TRUE; 
-    //$variables['abcd'] =   $form_state['values']['xyz'];
-    //$selected = isset($form_state['values']['datasets']) ? $form_state['values']['datasets']:1;
-    $selected = $form_state['values']['datasets']; // This is dataset.accession_no
-
-    
-    //If a valid dataset isn't selected, stop with a message
-    if (!$selected) {
-      //Must created the entire main-div content including start and end tags
-      $html_main_div = "";
-      //**IMP
-      $html_main_div .= "<div id='main-div'>"; //**IMP: Must include this, else, fails to display change the 2nd time select element is changed.
-      $html_main_div .= "<b> ??? &nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;Please Choose a Dataset from the Dropdown Above.</b>";
-      $html_main_div .= "</div>"; //**IMP
-      return $html_main_div;
-    }  // 
-    
-    
-    //Get the gene unique-name from tpl.php via the drupal-get-form
-    //Repeated here (also in _form_dropdown)
-    $geneUniquename = $form_state['build_info']['args'][0];  //Specified in tpl.php as extra arg in drupal_get_form()
-    
-    //    <<<<<  Display Dataset Details  ..........
-    //    Testing now.
-    
-    $dataset_details = get_dataset_details($selected); //gets acc and shortname
-    $shortname = $dataset_details['shortname'];
-    $name = $dataset_details['name'];
-    
-   
-
-    
-    //drupal_set_message("After lis_expression_form_datasets_dropdown_submit"." with "."dataset:".$selected);
-
-    
-    //Build content for the main-div including its own <div> tags    
-    $html_main_div = "";
-    //**IMP
-    $html_main_div_top .= "<div id='main-div'>"; //**IMP: Must include this, else, fails to display change the 2nd time select element is changed.
-    $html_main_div_top .= "<p>Main Div:</p>";  //REMOVE LATER
-    $html_main_div_header  = "Expression in Dataset <strong>". $selected . ":</strong> ". $name . "." ;
-    $html_main_div_header .= "<p>More expression to follow for: ". $shortname ." ....  .... " . "</p>";
-    
-    
-    //Get a div and content for genemodel-expression-data here
-        //preferably let a function create the 'div' and its 'html content'
-    
-    $html_main_div_genelevel_data = create_html_main_div_genelevel_data ($gene=$geneUniquename, $acc=$selected);// function call here
-    
-    
-    
-    //   .............................................>>>>    
-    
-    
-    $html_main_div_end = "</div>"; //**IMP
-    $html_main_div  = $html_main_div_top;
-    $html_main_div .= $html_main_div_header;
-    $html_main_div .= $html_main_div_genelevel_data;
-    $html_main_div .= "<p>...  ... ... </p>";
-    $html_main_div .= $html_main_div_end; 
-     
-    return $html_main_div;  //this line makes drupal-set-message fail, sometimes(!!) ???
-}
-
-
-*/
-
-
 //####   AVAILABLE VARIABLES
 
   //Available Variables:
@@ -456,5 +282,6 @@ function lis_expression_form_datasets_dropdown_submit ($form, &$form_state) {
 //####   DEFINED FUNCTIONS FOR TESTING ####
 
 
-  
 
+///////////////////     IGNORE:  SCRATCH & OBSOLETE      /////////////////////// 
+////////////////////////////////////////////////////////////////////////////////
