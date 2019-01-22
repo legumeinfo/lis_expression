@@ -31,7 +31,7 @@ straight to <a href="/lis_expression/all">Expression Summary Page</a>
 <h3>Examples to explore</h3>
 
 <ol>
- <li>A <a  href="/feature/Phaseolus/vulgaris/gene/Phvul.009G108100.v1.0#pane=geneexpressionprofile">stress response related gene</a> highly expressed in root tip   </li>  
+ <li>A <a  href="/feature/Phaseolus/vulgaris/gene/phavu.G19833.gnm1.ann1.Phvul.009G108100#pane=geneexpressionprofile">stress response related gene</a> highly expressed in root tip   </li>  
   <li> A chickpea gene predominantly expressed in the <a href="/feature/Cicer/arietinum_ICC4958/gene/cicar.ICC4958.gnm2.ann1.Ca_16436#pane=geneexpressionprofile">reproductive tissues</a> and another predominantly in the <a  href="/feature/Cicer/arietinum_ICC4958/gene/cicar.ICC4958.gnm2.ann1.Ca_01885#pane=geneexpressionprofile">vegetative tissues</a> with a family member also showing a similar expression profile.  </li>
    <li>A <a  href="/feature/Vigna/unguiculata/gene/vigun.IT97K-499-35.gnm1.ann1.Vigun01g004300#pane=geneexpressionprofile" >photosynthetic gene</a> expressed highly in leaves.</li>
   <li>Please note: its only other gene family member has a similar expression profile. </li>

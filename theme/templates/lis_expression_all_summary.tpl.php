@@ -24,7 +24,7 @@
   $exemplar_list ['cajca1'] = 'cajca.ICPL87119.gnm1.ann1.C.cajan_07765';
   $exemplar_list ['cicar1'] = 'cicar.ICC4958.gnm2.ann1.Ca_01885';
   $exemplar_list ['cicar2'] = 'cicar.CDCFrontier.gnm1.ann1.Ca_04638';  //expressed only in early-flower-bud, Ubiquitin like
-  $exemplar_list ['phavu1'] = 'Phvul.001G011300.v1.0';
+  $exemplar_list ['phavu1'] = 'phavu.G19833.gnm1.ann1.Phvul.001G011300';
   $exemplar_list ['vigun1'] = 'vigun.IT97K-499-35.gnm1.ann1.Vigun01g004300';
       //$exemplar_list [''] = '';
   */
@@ -81,7 +81,7 @@
         print "<td>".$genus." ". $species ."</td>";
         
         //print "<td>" . "<b>" . $acc_no. "<b>" . "</td>";
-        print "<td id='$acc_no' >" . "<b>" . $acc_link. "<b>" . "</td>";
+        print "<td id='$acc_no' >" . "<b>" . $acc_link. "<b>" .  "</td>";
         print "<td>".$genome_name."</td>";
         //print "<td>".$shortname."</td>";
         print "<td>".$name."</td>";
