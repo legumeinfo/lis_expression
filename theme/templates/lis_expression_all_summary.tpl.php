@@ -13,8 +13,9 @@
 ?>
 
 <h2>Summary of Expression Data at LIS</h2>
-<p>Explore expression data at LIS: <a  href="/lis_expression/demo">Demo page</a></p>
-
+<p>
+  <a href="#datasets" > Datasets </a> &nbsp;&nbsp; | &nbsp;&nbsp; <a  href="/lis_expression/demo">Examples</a>  &nbsp;&nbsp; | &nbsp;&nbsp; <a href="/lis_expression/conekt">Comparative Expression (CoNekT)</a>   <br/> 
+</p>
 <?php
 
   /*    //ADD EXEMPLAR after a daset is added
@@ -35,6 +36,7 @@
   $queried_all = db_query($sql_all);
       //print(gettype($queried_all));
   $ds_count = $queried_all->rowCount();
+  print "<strong><a id=\"datasets\" > Datasets </a>:</strong>" . "<br/>";
   print "Number of datasets at LIS (all species): " . $ds_count . "<br/>";
   
   $result_all = $queried_all->fetchAll();

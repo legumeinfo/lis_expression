@@ -13,8 +13,8 @@
 ?>
 
 <h2>Expression Data At LIS (LegFed workshop, Mar 2018)</h2>
-<a target="_blank"  href="https://legumeinfo.org">https://legumeinfo.org</a>
-
+<!-- <a target="_blank"  href="https://legumeinfo.org">https://legumeinfo.org</a> -->
+<a href="/lis_expression/all">Back to: Expression Summary page </a>
 <h3>How to reach the expression data:</h3>
 <u>From Gene Search: </u><br>
 At home page: Gene Search button (2nd row) --> Select a species (cajca, cicar.ICC4958, <b>phavu</b>, vigun) & Search  --> select a gene from the result table --> Click  'Expression' on the left panel. And, explore the expression data for this gene.<br>

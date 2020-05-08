@@ -122,6 +122,13 @@ function lis_expression_menu_alter(&$items) {
         'type' => MENU_CALLBACK,
         'access callback' => TRUE 
   );
+         //For lis_expression page: Conekt
+  $items['lis_expression/conekt'] = array(
+        'page callback' => 'lis_expression_conekt_callback', // in includes/lis_expression_helper_functions.inc
+        //'page arguments' => array(2, 3), //
+        'type' => MENU_CALLBACK,
+        'access callback' => TRUE 
+  );
   
   
   //return $items; //Don't return. Because: The tripal_gene module already has the $items array. This adds to that array
@@ -202,6 +209,12 @@ function lis_expression_theme($existing, $type, $theme, $path) {
         //for lis_expression/demo  summary page
         'lis_expression_demo' => array(
             'template' => 'lis_expression_demo_workshop',
+            'path' => "$this_path/theme/templates",
+        ),
+        
+	//for lis_expression/conekt  iframe page
+        'lis_expression_conekt' => array(
+            'template' => 'lis_expression_conekt_iframed',
             'path' => "$this_path/theme/templates",
         ),
         

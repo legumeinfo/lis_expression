@@ -287,6 +287,18 @@
   }
 
 
+  
+  /*
+  * 8. Function lis_expression_conekt_callback ()
+  *   Just returns the theme for the lis_expressionconekt iframed page.
+  *   From hook_menu in 'lis_expression/conekt'
+  */
+
+  function lis_expression_conekt_callback () {
+      return theme ('lis_expression_conekt', array());
+  }
+
+
 
 
 
