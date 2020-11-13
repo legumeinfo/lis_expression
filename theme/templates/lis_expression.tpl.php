@@ -31,7 +31,7 @@
       return; //Quit if there isn't any expression dataset for this gene
   }
   //...........................................................................
-  $conekt_link = "<a href=\"https://conekt.lis.ncgr.org/sequence/find_forLIS/".$gene_uniquename."\"  target=\"_blank\">"."See at CoNekT-Legumes"."</a>"
+  $conekt_link = "<a href=\"https://conekt.legumeinfo.org/sequence/find_forLIS/".$gene_uniquename."\"  target=\"_blank\">"."See at CoNekT-Legumes"."</a>"
   //https://conekt.lis.ncgr.org/sequence/find_forLIS/vigun.IT97K-499-35.gnm1.ann1.Vigun08g000600
 ?>
 
