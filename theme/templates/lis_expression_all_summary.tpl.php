@@ -14,7 +14,8 @@
 
 <h2>Summary of Expression Data at LIS</h2>
 <p>
-  <a href="#datasets" > Datasets </a> &nbsp;&nbsp; | &nbsp;&nbsp; <a  href="/lis_expression/demo">Examples</a>  &nbsp;&nbsp; | &nbsp;&nbsp; <a href="/lis_expression/conekt">Comparative Expression (CoNekT)</a>   <br/> 
+<!--  <a href="#datasets" > Datasets </a> &nbsp;&nbsp; | &nbsp;&nbsp; <a  href="/lis_expression/demo">Examples</a>  &nbsp;&nbsp; | &nbsp;&nbsp; <a href="/lis_expression/conekt">Comparative Expression (CoNekT)</a>   <br/> --> 
+  <a href="#datasets" > Datasets </a> &nbsp;&nbsp; | &nbsp;&nbsp; <a  href="/lis_expression/demo">Examples</a>  &nbsp;&nbsp; | &nbsp;&nbsp; <a href="https://conekt.lis.ncgr.org/" target="_blank">Comparative Expression (CoNekT)</a>   <br/> 
 </p>
 <?php
 
